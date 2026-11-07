@@ -189,11 +189,14 @@ def main():
         for c in cands:
             j = gh_api("/advisories/" + c["ghsa"])
             if j:
-                ep = j.get("epss") or []
-                if ep:
-                    c["epss_percentage"] = ep[0].get("percentage", "")
-                    c["epss_percentile"] = ep[0].get("percentile", "")
-                c["credits"] = ", ".join(x.get("user", {}).get("login", "") for x in j.get("credits") or [])
+                ep = j.get("epss") or {}
+                if isinstance(ep, list):  # GitHub returns one object; accept a list too
+                    ep = ep[0] if ep else {}
+                if isinstance(ep, dict):
+                    c["epss_percentage"] = ep.get("percentage", "") or ""
+                    c["epss_percentile"] = ep.get("percentile", "") or ""
+                c["credits"] = ", ".join(((x or {}).get("user") or {}).get("login", "")
+                                         for x in (j.get("credits") or []) if isinstance(x, dict))
             if not c["duplicate_of"] and c["source"] != "GitHub-reviewed" and c["cve"]:
                 r = gh_api("/advisories?type=reviewed&cve_id=" + c["cve"].split(";")[0])
                 if r:
