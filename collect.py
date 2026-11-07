@@ -92,13 +92,19 @@ def main():
     ap.add_argument("--date", default=(dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=1)).strftime("%Y-%m-%d"))
     ap.add_argument("--out", default=os.path.join(HERE, "daily"))
     ap.add_argument("--no-api", action="store_true")
+    ap.add_argument("--lookback", type=int, default=14,
+                    help="also re-check this many earlier days for flaws whose score arrived late")
     a = ap.parse_args()
     day = dt.date.fromisoformat(a.date)
     names, pkgs, repos, name_rx, slugs = load_registry()
 
-    # GitHub files advisories in year/month folders; scan the day's month and the one before.
-    months = {(day.year, day.month), ((day.replace(day=1) - dt.timedelta(days=1)).year,
-                                       (day.replace(day=1) - dt.timedelta(days=1)).month)}
+    start = day - dt.timedelta(days=a.lookback)
+    # GitHub files advisories in year/month folders by first publication; scan every month from
+    # the month before the look-back window starts through the day's month.
+    months, m = set(), (start.replace(day=1) - dt.timedelta(days=1)).replace(day=1)
+    while m <= day:
+        months.add((m.year, m.month))
+        m = (m + dt.timedelta(days=32)).replace(day=1)
     files = []
     for kind in ("github-reviewed", "unreviewed"):
         for y, m in months:
@@ -109,13 +115,15 @@ def main():
     cands = []
     for f in files:
         d = json.load(open(f, encoding="utf-8"))
-        if d.get("withdrawn") or d["published"][:10] != a.date:
+        pub = d["published"][:10]
+        if d.get("withdrawn") or not (start.isoformat() <= pub <= a.date):
             continue
-        scanned += 1
+        today = pub == a.date
+        scanned += today
         score, ver, vec = score_of(d)
         if score is None or score < 8.0:
             continue
-        severe += 1
+        severe += today
         source = "GitHub-reviewed" if "/github-reviewed/" in f.replace("\\", "/") else "GitHub-unreviewed (from NVD)"
         aff = d.get("affected", [])
         packages = sorted({x.get("package", {}).get("name", "") for x in aff} - {""})
@@ -158,8 +166,9 @@ def main():
         fixed = sorted({e["fixed"] for x in aff for r in x.get("ranges", []) for e in r.get("events", []) if "fixed" in e})
         av = re.search(r"AV:([NALP])", vec); pr = re.search(r"PR:([NLH])", vec)
         c = dict(
-            ghsa=own, cve=";".join(cves), published=a.date,
-            week_start=(day - dt.timedelta(days=day.weekday())).isoformat(),
+            ghsa=own, cve=";".join(cves), published=pub,
+            week_start=(dt.date.fromisoformat(pub) - dt.timedelta(days=dt.date.fromisoformat(pub).weekday())).isoformat(),
+            catch_up="" if today else "Yes",
             score=score, cvss_version=ver, source=source,
             package=";".join(packages), ecosystem=";".join(ecos),
             summary=(d.get("summary") or d.get("details", ""))[:300].replace("\n", " "),
@@ -183,6 +192,12 @@ def main():
             epss_percentage="", epss_percentile="", credits="",
         )
         cands.append(c)
+
+    # Earlier days: keep only flaws never sent before (their score arrived after that day's run).
+    os.makedirs(a.out, exist_ok=True)
+    seen_path = os.path.join(a.out, "seen.txt")
+    seen = set(open(seen_path).read().split()) if os.path.exists(seen_path) else set()
+    cands = [c for c in cands if not c["catch_up"] or c["ghsa"] not in seen]
 
     # Enrich from GitHub's API: EPSS, credits, and a check for a reviewed advisory with the same CVE.
     if not a.no_api:
@@ -213,11 +228,14 @@ def main():
                      f"REFS: {c['refs']}")
     out = dict(date=a.date, generated_at=dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
                scanned=scanned, severe=severe, candidate_count=len(cands),
+               late_scored_count=sum(1 for c in cands if c["catch_up"]),
                candidates_text="\n".join(lines) if lines else "NONE", candidates=cands)
-    os.makedirs(a.out, exist_ok=True)
     with open(os.path.join(a.out, a.date + ".json"), "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1, ensure_ascii=False)
-    print(f"{a.date}: {scanned} advisories, {severe} rated 8.0+, {len(cands)} AI candidates")
+    with open(seen_path, "a") as fh:
+        fh.write("".join(c["ghsa"] + "\n" for c in cands if c["ghsa"] not in seen))
+    late = sum(1 for c in cands if c["catch_up"])
+    print(f"{a.date}: {scanned} advisories, {severe} rated 8.0+, {len(cands)} AI candidates ({late} late-scored from earlier days)")
 
 
 if __name__ == "__main__":
