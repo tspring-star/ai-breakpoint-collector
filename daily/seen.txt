@@ -1668,3 +1668,4 @@ GHSA-g936-836g-r2pg
 GHSA-3fw5-5q64-5hwx
 GHSA-vf3g-89fc-wcmp
 GHSA-f2g3-r2rh-7h5f
+GHSA-54m9-hhxp-c88f
