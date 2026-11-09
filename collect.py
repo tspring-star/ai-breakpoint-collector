@@ -86,12 +86,43 @@ def gh_api(path):
         return None
 
 
+KEV_URLS = ["https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+            "https://raw.githubusercontent.com/cisagov/kev-data/main/known_exploited_vulnerabilities.json"]
+
+
+def load_kev(path=None):
+    if path:
+        return json.load(open(path, encoding="utf-8")).get("vulnerabilities", [])
+    for u in KEV_URLS:
+        try:
+            req = urllib.request.Request(u, headers={"User-Agent": "SPB-AI-Breakpoint"})
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return json.load(r).get("vulnerabilities", [])
+        except Exception as e:
+            print("KEV download failed", u, e, file=sys.stderr)
+    return []
+
+
+def cve_to_ghsa(db, cve):
+    """Find the GitHub advisory for a CVE (reviewed first, then unreviewed)."""
+    for kind in ("github-reviewed", "unreviewed"):
+        for f in glob.glob(os.path.join(db, "advisories", kind, "*", "*", "*", "*.json")):
+            try:
+                txt = open(f, encoding="utf-8").read()
+            except Exception:
+                continue
+            if '"' + cve + '"' in txt:
+                return os.path.basename(f)[:-5]
+    return ""
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--db", required=True)
     ap.add_argument("--date", default=(dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=1)).strftime("%Y-%m-%d"))
     ap.add_argument("--out", default=os.path.join(HERE, "daily"))
     ap.add_argument("--no-api", action="store_true")
+    ap.add_argument("--kev-file", help="use a local copy of CISA's KEV JSON instead of downloading it")
     ap.add_argument("--lookback", type=int, default=14,
                     help="also re-check this many earlier days for flaws whose score arrived late")
     a = ap.parse_args()
@@ -219,6 +250,36 @@ def main():
                     if other:
                         c["duplicate_of"] = other[0]
 
+    # CISA's Known Exploited Vulnerabilities (KEV) list: AI flaws CISA added in the last week that we haven't reported yet.
+    kev_ai, kev_new = [], 0
+    kev = load_kev(a.kev_file)
+    kev_seen_path = os.path.join(a.out, "kev_seen.txt")
+    kev_seen = set(open(kev_seen_path).read().split()) if os.path.exists(kev_seen_path) else set()
+    kev_start = (day - dt.timedelta(days=7)).isoformat()
+    fresh = [v for v in kev if kev_start <= v.get("dateAdded", "") <= a.date and v.get("cveID") not in kev_seen]
+    kev_new = len(fresh)
+    for v in fresh:
+        text = " ".join(str(v.get(k, "")) for k in ("vendorProject", "product", "vulnerabilityName", "shortDescription"))
+        why, reg = [], None
+        m = name_rx.search(text)
+        if m:
+            reg = names[m.group(1).lower()]; why.append("registry name: " + m.group(1))
+        if BRAND.search(text): why.append("brand term")
+        if GENERIC.search(text): why.append("AI term")
+        if not why:
+            continue
+        ghsa = cve_to_ghsa(a.db, v["cveID"])
+        kev_ai.append(dict(
+            cve=v["cveID"], vendor=v.get("vendorProject", ""), product=v.get("product", ""),
+            name=v.get("vulnerabilityName", ""), description=v.get("shortDescription", "")[:600],
+            date_added=v.get("dateAdded", ""), due_date=v.get("dueDate", ""),
+            ransomware=v.get("knownRansomwareCampaignUse", ""), match=", ".join(why),
+            registry_product=reg["product"] if reg else "", ghsa=ghsa,
+            in_sheet="Yes" if ghsa and ghsa in seen else "No",
+            link="https://nvd.nist.gov/vuln/detail/" + v["cveID"]))
+    with open(kev_seen_path, "a") as fh:
+        fh.write("".join(v["cveID"] + "\n" for v in fresh))
+
     cands.sort(key=lambda c: -c["score"])
     lines = []
     for i, c in enumerate(cands, 1):
@@ -229,13 +290,15 @@ def main():
     out = dict(date=a.date, generated_at=dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
                scanned=scanned, severe=severe, candidate_count=len(cands),
                late_scored_count=sum(1 for c in cands if c["catch_up"]),
-               candidates_text="\n".join(lines) if lines else "NONE", candidates=cands)
+               candidates_text="\n".join(lines) if lines else "NONE", candidates=cands,
+               kev_new_count=kev_new, kev_ai_count=len(kev_ai), kev_ai=kev_ai)
     with open(os.path.join(a.out, a.date + ".json"), "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1, ensure_ascii=False)
     with open(seen_path, "a") as fh:
         fh.write("".join(c["ghsa"] + "\n" for c in cands if c["ghsa"] not in seen))
     late = sum(1 for c in cands if c["catch_up"])
-    print(f"{a.date}: {scanned} advisories, {severe} rated 8.0+, {len(cands)} AI candidates ({late} late-scored from earlier days)")
+    print(f"{a.date}: {scanned} advisories, {severe} rated 8.0+, {len(cands)} AI candidates ({late} late-scored from earlier days); "
+          f"KEV: {kev_new} new entries, {len(kev_ai)} possibly AI")
 
 
 if __name__ == "__main__":
