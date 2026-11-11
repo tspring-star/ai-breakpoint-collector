@@ -1673,3 +1673,10 @@ GHSA-rm8c-2cv8-jwf6
 GHSA-9hq4-hm3j-jmph
 GHSA-qfxj-2x5m-gvvg
 GHSA-4p8p-pjpq-2w7h
+GHSA-wrjw-2jmw-h5xr
+GHSA-298x-8vc9-pjwx
+GHSA-6m57-vrcv-v9j4
+GHSA-2h4w-29cv-2cmv
+GHSA-xgj3-w2cc-qgrq
+GHSA-jvch-w6fx-vccj
+GHSA-98gm-52cv-35p7
