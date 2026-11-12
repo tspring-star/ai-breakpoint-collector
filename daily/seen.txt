@@ -1680,3 +1680,7 @@ GHSA-2h4w-29cv-2cmv
 GHSA-xgj3-w2cc-qgrq
 GHSA-jvch-w6fx-vccj
 GHSA-98gm-52cv-35p7
+GHSA-cfcv-hfxc-g2rj
+GHSA-qhwv-f2p7-7fxg
+GHSA-c8gw-68p7-p8v3
+GHSA-jhvx-hcq3-vmx2
