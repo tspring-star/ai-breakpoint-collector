@@ -1684,3 +1684,5 @@ GHSA-cfcv-hfxc-g2rj
 GHSA-qhwv-f2p7-7fxg
 GHSA-c8gw-68p7-p8v3
 GHSA-jhvx-hcq3-vmx2
+GHSA-f3w6-w445-fwh9
+GHSA-g498-8632-6hwv
