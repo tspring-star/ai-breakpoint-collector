@@ -1686,3 +1686,12 @@ GHSA-c8gw-68p7-p8v3
 GHSA-jhvx-hcq3-vmx2
 GHSA-f3w6-w445-fwh9
 GHSA-g498-8632-6hwv
+GHSA-q33x-f753-x487
+GHSA-65p4-8rwx-hgv4
+GHSA-gfvp-wqxw-g8qp
+GHSA-v9v2-rjrw-hvv2
+GHSA-h8w4-vgpr-474w
+GHSA-pfgc-h44r-q35q
+GHSA-p6j3-gj3p-wv45
+GHSA-ccpq-6vhp-2mrj
+GHSA-pjrq-r86m-9r53
