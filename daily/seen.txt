@@ -1695,3 +1695,4 @@ GHSA-pfgc-h44r-q35q
 GHSA-p6j3-gj3p-wv45
 GHSA-ccpq-6vhp-2mrj
 GHSA-pjrq-r86m-9r53
+GHSA-fp2v-98c9-h9m3
