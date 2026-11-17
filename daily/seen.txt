@@ -1696,3 +1696,8 @@ GHSA-p6j3-gj3p-wv45
 GHSA-ccpq-6vhp-2mrj
 GHSA-pjrq-r86m-9r53
 GHSA-fp2v-98c9-h9m3
+GHSA-jq3q-62jc-fqq9
+GHSA-r24j-jphp-67xq
+GHSA-6q5g-gff3-7hmg
+GHSA-cjv8-6488-8485
+GHSA-gxcv-hr94-jjmj
