@@ -1701,3 +1701,6 @@ GHSA-r24j-jphp-67xq
 GHSA-6q5g-gff3-7hmg
 GHSA-cjv8-6488-8485
 GHSA-gxcv-hr94-jjmj
+GHSA-gfv3-m769-5xm3
+GHSA-g34g-582q-rw8g
+GHSA-9j6g-pg5c-5c65
