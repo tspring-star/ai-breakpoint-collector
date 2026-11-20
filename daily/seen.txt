@@ -1721,3 +1721,13 @@ GHSA-cp8r-6jmm-c5qw
 GHSA-x4wv-wh23-vxjx
 GHSA-jqp2-59g3-wp39
 GHSA-jwg6-r9g5-vmv7
+GHSA-x8q7-6c7m-52gw
+GHSA-833v-v58w-294h
+GHSA-2m9m-6cr5-9x25
+GHSA-mx6p-3fg7-v6pj
+GHSA-f39r-fvgx-3c5v
+GHSA-jq2f-6vj2-4r5g
+GHSA-q433-mp6c-8v4f
+GHSA-3mgh-93r5-r7jf
+GHSA-f4fq-q856-4p7g
+GHSA-84hp-vf92-h67x
