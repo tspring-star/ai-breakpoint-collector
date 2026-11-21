@@ -1731,3 +1731,12 @@ GHSA-q433-mp6c-8v4f
 GHSA-3mgh-93r5-r7jf
 GHSA-f4fq-q856-4p7g
 GHSA-84hp-vf92-h67x
+GHSA-p34x-fmph-9fjx
+GHSA-2f43-rwqm-6h67
+GHSA-9x8x-crjq-g64h
+GHSA-4hrh-34w3-5ww8
+GHSA-2mr3-rxrq-238c
+GHSA-92hv-w2fh-9w89
+GHSA-66q9-mxf2-xqw6
+GHSA-25qc-m4pw-2w8r
+GHSA-v9v2-98xq-627c
