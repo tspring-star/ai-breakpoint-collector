@@ -1757,3 +1757,7 @@ GHSA-7rc3-jqv7-7gw2
 GHSA-cm25-j9rr-5r3r
 GHSA-p279-fmx8-wwvv
 GHSA-2xmc-95h3-hcrm
+GHSA-2hj6-2qpj-pqj2
+GHSA-6j3q-5m96-8cpq
+GHSA-4cx6-qfwr-9vfq
+GHSA-8cf9-9rx7-rppm
