@@ -1761,3 +1761,14 @@ GHSA-2hj6-2qpj-pqj2
 GHSA-6j3q-5m96-8cpq
 GHSA-4cx6-qfwr-9vfq
 GHSA-8cf9-9rx7-rppm
+GHSA-c4hm-4h84-2cf3
+GHSA-gw5c-fw3v-mrgh
+GHSA-7f42-7xr6-v2xj
+GHSA-hvw4-mh2q-3vph
+GHSA-xgh6-r9wg-pqmw
+GHSA-3726-7qv6-w947
+GHSA-pvw5-hqrm-5j3m
+GHSA-g9cr-64fh-35qg
+GHSA-6jhm-2fvf-fjxw
+GHSA-x36p-mpv9-3rxc
+GHSA-6h5j-pgwm-x4j6
