@@ -1772,3 +1772,9 @@ GHSA-g9cr-64fh-35qg
 GHSA-6jhm-2fvf-fjxw
 GHSA-x36p-mpv9-3rxc
 GHSA-6h5j-pgwm-x4j6
+GHSA-87j2-qjpp-mhqr
+GHSA-xxx9-5ff3-6qrj
+GHSA-87w8-5xwj-rrfw
+GHSA-f86p-wv5j-r5vj
+GHSA-q4rx-6738-mm5v
+GHSA-cwhr-v24q-635x
