@@ -1801,3 +1801,6 @@ GHSA-w72p-hcvg-r9m3
 GHSA-mqxc-j2ww-xfvx
 GHSA-m74q-q7r8-37r6
 GHSA-5j23-2pf6-3cg8
+GHSA-v8hh-3g3q-46jx
+GHSA-wg5w-425h-9fvm
+GHSA-2grr-m6jx-xp3j
